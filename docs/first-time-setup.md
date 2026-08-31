@@ -1,4 +1,4 @@
-# First-time setup, explained for humans
+# First-time setup, explained for noobs
 
 This is the long version of the README's checklist — what each app actually
 is, why the steps are in this order, and every click spelled out. Nothing
@@ -56,9 +56,6 @@ Open `http://server-ip:8080`.
 That path matters more than it looks: it's on the same disk mount the other
 apps see, which is what makes imports instant (hardlinks) instead of copies.
 
-Optional but good: forward port **6881** (TCP+UDP) to this machine on your
-router — not required to download, but speeds things up and helps seeding.
-
 ---
 
 ## Prowlarr: the search brain
@@ -94,11 +91,19 @@ Setup:
      **FlareSolverr**, Host: `http://flaresolverr:8191`, Tags: `cf` → Save.
    - On the failing indexer, add the tag `cf` — it now goes through the
      unblocking proxy.
-4. **Connect it to Sonarr and Radarr**: Settings → **Apps** → **+**:
+4. **Connect it to Sonarr and Radarr**. First fetch the two API keys —
+   each app only shows its own:
+   - Open **Sonarr** in another browser tab (`http://server-ip:8989`) →
+     **Settings → General** → under *Security* there's an **API Key** field
+     (a long string of letters and numbers) → copy it.
+   - Same for **Radarr** (`http://server-ip:7878`): Settings → General →
+     copy its API Key.
+
+   Back in Prowlarr: Settings → **Apps** → **+**:
    - **Sonarr**: Prowlarr Server `http://prowlarr:9696`, Sonarr Server
-     `http://sonarr:8989`, API Key: *from Sonarr* (Settings → General) →
-     Test → Save.
-   - **Radarr**: same idea — `http://radarr:7878`, API key from Radarr.
+     `http://sonarr:8989`, API Key: paste *Sonarr's* key → Test → Save.
+   - **Radarr**: same idea — Radarr Server `http://radarr:7878`, API Key:
+     paste *Radarr's* key → Test → Save.
 
 That's it. Open Sonarr or Radarr → Settings → Indexers and you'll see every
 indexer already there, tagged "Prowlarr". Never add indexers anywhere else
@@ -114,8 +119,11 @@ Open `http://server-ip:8989`.
    → **Add Root Folder** → `/data/tv`.
 2. **Download client** (how it hands work to qBittorrent): Settings →
    **Download Clients** → **+** → qBittorrent:
-   - Host: `172.28.0.50`  ← the IP, not a name (qBittorrent rejects
-     container names — this is expected)
+   - Host: `172.28.0.50` — this is qBittorrent's internal address, and
+     couchpilot pins it to that exact value for everyone, so just type it
+     as-is. (Why an IP and not a name? qBittorrent rejects container
+     names — expected. Only different if you edited `QBIT_IP` in `.env`,
+     in which case use that value; check with `grep QBIT_IP .env`.)
    - Port: `8080`
    - Username/password: your qBittorrent login from earlier
    - Test → Save.
@@ -223,8 +231,17 @@ the reception desk.** Use the control room yourself; give guests the desk.
 
 - Anything with a **Test** button: use it — the error text is usually the
   actual problem (wrong API key, wrong port).
-- Downloads sit at 100% but never import → the qBittorrent save path isn't
-  exactly `/data/downloads/complete` ([why it matters](storage.md)).
+- Downloads sit at 100% but never import → two usual suspects:
+  1. The qBittorrent save path isn't exactly `/data/downloads/complete`
+     ([why it matters](storage.md)).
+  2. Sonarr/Radarr decided the file needs a human look (odd naming, a
+     quality mismatch, a sample file...). Check **Activity → Queue** —
+     hover the orange ⚠ icon to read the reason. To import it by hand:
+     click the little **person icon** on that queue row (interactive
+     import), or use **Wanted → Manual Import** in Sonarr /
+     **Movies → Manual Import** in Radarr, browse to
+     `/data/downloads/complete`, and tell it which series/movie the file
+     belongs to.
 - An indexer fails with a Cloudflare error → FlareSolverr step in
   [Prowlarr](#prowlarr-the-search-brain) above.
 - Everything else: `./mc logs <app>` nearly always names the culprit.

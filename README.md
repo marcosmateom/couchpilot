@@ -14,7 +14,9 @@ cd couchpilot
 ./mc up        # starts everything
 ```
 
-Then open `http://YOUR-SERVER-IP:5055` and request your first movie. 🎬
+Then wire the apps together once — 15 minutes, see
+[First-time app setup](#first-time-app-setup-15-minutes-once) below — and
+request your first movie. 🎬
 
 ---
 
@@ -71,8 +73,8 @@ You choose during setup; you can change your mind anytime by re-running it.
 
 ## First-time app setup (15 minutes, once)
 
-If you haven't yet: run `./mc setup` (the questions), **then** `./mc up`
-(the start button). The apps below are only reachable after both —
+If you haven't yet: run `./mc setup` (answer the questions), **then**
+`./mc up` (the start button). The apps below are only reachable after both —
 `./mc ip` prints every URL.
 
 > **Know your way around?** You can skip the wizard: `cp .env.example .env`,
