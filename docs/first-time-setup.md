@@ -35,6 +35,22 @@ to *each other* (instead of your login). Every *arr app shows its own under
 **Settings → General → API Key**. When app A wants to talk to app B, you
 paste **B's** key into A.
 
+And one thing that confuses everyone the first time — **there are two kinds
+of addresses** in this guide:
+
+- `http://server-ip:8989` — how **you** reach an app, from your browser.
+  Replace `server-ip` with your machine's actual IP (`./mc ip` shows it).
+- `http://sonarr:8989`, address `radarr`, `http://jellyfin:8096` — how the
+  apps reach **each other**, inside Docker. Containers know each other by
+  plain name, so whenever a settings field is one app talking to another,
+  type the name **exactly as written** — it's not a placeholder, it's the
+  real address, and it's the same for every couchpilot install. (These
+  name-addresses only work between the apps — they won't open in your
+  browser.)
+- The one exception is qBittorrent, which the other apps reach by a fixed
+  IP (`172.28.0.50`) instead of a name — the reason is explained in its
+  step below.
+
 ---
 
 ## qBittorrent: the downloader
@@ -99,7 +115,9 @@ Setup:
    - Same for **Radarr** (`http://server-ip:7878`): Settings → General →
      copy its API Key.
 
-   Back in Prowlarr: Settings → **Apps** → **+**:
+   Back in Prowlarr: Settings → **Apps** → **+** (the server addresses
+   below are literal — type them exactly as written; see "two kinds of
+   addresses" at the top):
    - **Sonarr**: Prowlarr Server `http://prowlarr:9696`, Sonarr Server
      `http://sonarr:8989`, API Key: paste *Sonarr's* key → Test → Save.
    - **Radarr**: same idea — Radarr Server `http://radarr:7878`, API Key:
