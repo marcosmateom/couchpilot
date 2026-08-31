@@ -11,7 +11,7 @@ public access. Cost: a domain is ~$10/year; everything else here is free.
 2. **The domain on Cloudflare (free plan)** — couchpilot gets its certificates
    through Cloudflare's DNS API. If you bought the domain elsewhere, add it to
    Cloudflare (dashboard → Add a site) and point your registrar's nameservers
-   at the two Cloudflare gives you.
+   at the two nameservers Cloudflare gives you.
 3. **A Cloudflare API token**:
    - Cloudflare dashboard → My Profile → **API Tokens** → Create Token
    - Use the **"Edit zone DNS"** template

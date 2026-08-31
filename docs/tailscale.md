@@ -33,11 +33,11 @@ Tip: in the admin console, disable key expiry for the server
 - **Serving your whole LAN** (optional): Tailscale can advertise your home
   subnet so remote devices reach *everything* at home. That's a host-level
   decision; see Tailscale's [subnet router docs](https://tailscale.com/kb/1019/subnets).
-- **Domain mode**: if you also set up a domain (docs/domain-https.md), point
+- **Domain mode**: if you also set up a domain ([domain-https.md](domain-https.md)), point
   the Cloudflare A records at the Tailscale IP and remote devices get the
   same pretty HTTPS URLs.
 
-## Already run Tailscale on the host?
+## Already running Tailscale on the host?
 
 Skip the profile — the wizard detects a running `tailscaled` and skips it
 automatically. A host install already gives you everything above; running

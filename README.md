@@ -10,7 +10,7 @@ your family can use without ever asking you anything.
 ```bash
 git clone https://github.com/marcosmateom/couchpilot.git
 cd couchpilot
-./mc setup     # answers a few questions, sets everything up
+./mc setup     # asks a few questions, sets everything up
 ./mc up        # starts everything
 ```
 
@@ -71,39 +71,63 @@ You choose during setup; you can change your mind anytime by re-running it.
 
 ## First-time app setup (15 minutes, once)
 
-After `./mc up`, wire the apps together. `./mc ip` prints every URL.
-Do them in this order:
+If you haven't yet: run `./mc setup` (the questions), **then** `./mc up`
+(the start button). The apps below are only reachable after both —
+`./mc ip` prints every URL.
+
+> **Know your way around?** You can skip the wizard: `cp .env.example .env`,
+> edit it (it documents every variable, including the no-wizard notes at the
+> top), then `./mc up`.
+
+Now wire the apps together, in this order. Each step here is the short
+version — **[docs/first-time-setup.md](docs/first-time-setup.md) walks
+through the same steps click by click**, with explanations of what each app
+is and why the order matters. New to the *arr world? Read that instead.
 
 1. **qBittorrent** (`:8080`) — get the temporary password from
    `./mc logs qbittorrent` (look for "temporary password"), log in as
    `admin`, then Settings → WebUI → change username/password.
    Settings → Downloads → Default Save Path: `/data/downloads/complete`,
    and tick "Keep incomplete torrents in": `/data/downloads/incomplete`.
+   [→ guide](docs/first-time-setup.md#qbittorrent-the-downloader)
 2. **Prowlarr** (`:9696`) — create your login. Add indexers (Indexers → Add;
    start with a few public ones). Then Settings → Apps → add **Sonarr**
    (server `http://sonarr:8989`, its API key is in Sonarr → Settings →
    General) and **Radarr** (`http://radarr:7878`) — Prowlarr now pushes
    every indexer to both automatically.
+   [→ guide (read this one!)](docs/first-time-setup.md#prowlarr-the-search-brain)
 3. **Sonarr** (`:8989`) — Settings → Media Management → Add Root Folder:
    `/data/tv`. Settings → Download Clients → add qBittorrent: host
    `172.28.0.50`, port `8080`, your qBittorrent login.
+   [→ guide](docs/first-time-setup.md#sonarr-tv-shows)
 4. **Radarr** (`:7878`) — same, with root folder `/data/movies` and the same
    qBittorrent client.
+   [→ guide](docs/first-time-setup.md#radarr-movies)
 5. **Bazarr** (`:6767`) — Settings → Sonarr: address `sonarr`, port `8989`,
    API key from Sonarr. Settings → Radarr: address `radarr`, port `7878`.
    Settings → Languages: pick yours. Add a couple of providers
    (OpenSubtitles etc.).
+   [→ guide](docs/first-time-setup.md#bazarr-subtitles)
 6. **Jellyfin** (`:8096`) — the wizard creates your account. Add libraries:
    Movies → `/data/movies`, Shows → `/data/tv`. If setup enabled GPU
    transcoding: Dashboard → Playback → Transcoding → pick your encoder
    ([which one?](docs/hardware-transcoding.md)).
+   [→ guide](docs/first-time-setup.md#jellyfin-the-streaming-part)
 7. **Jellyseerr** (`:5055`) — Sign in with your **Jellyfin** account, URL
    `http://jellyfin:8096`. Add Radarr (`radarr`, port `7878`, root
    `/data/movies`) and Sonarr (`sonarr`, port `8989`, root `/data/tv`),
    API keys from each app. Mark both as default.
+   [→ guide](docs/first-time-setup.md#jellyseerr-the-request-page)
 
 Done. From now on: request in Jellyseerr → appears in Jellyfin.
 Family members: make them Jellyfin users; they log into Jellyseerr with that.
+
+**You don't have to go through Jellyseerr yourself** — adding things
+directly in Sonarr (Series → Add New) or Radarr (Movies → Add New) does the
+same job with more control (pick the exact release, monitor specific
+seasons, upgrade qualities). Think of Sonarr/Radarr as the control room and
+Jellyseerr as the reception desk for everyone else.
+[→ more](docs/first-time-setup.md#do-i-even-need-jellyseerr)
 
 ## Daily driving
 
