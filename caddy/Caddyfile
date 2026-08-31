@@ -1,0 +1,115 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Caddyfile — couchpilot reverse proxy
+#
+# This file is static — do not edit it for domain setup.
+#
+# Every service is reachable at  http://<server-ip>:<port>  (blocks below).
+# If you enable domain mode in `./mc setup`, it generates
+# caddy/sites/domain.caddy with one HTTPS vhost per service; the import at
+# the bottom picks it up automatically.
+#
+# A port block for a service you haven't enabled (e.g. Komga without the
+# manga profile) is harmless — it just answers 502 until the service exists.
+# ══════════════════════════════════════════════════════════════════════════════
+
+{
+    log {
+        output stdout
+        format console
+        level WARN
+    }
+}
+
+# ─── Snippet: common options for every site ───────────────────────────────────
+# Caddy adds X-Forwarded-For / X-Forwarded-Proto / X-Real-IP by itself.
+(site_common) {
+    encode gzip
+}
+
+# ─── Snippet: HTTPS certificates for domain mode ──────────────────────────────
+# Let's Encrypt via Cloudflare DNS-01 (no port forwarding needed). Imported by
+# the generated vhosts in sites/domain.caddy — never used in local-only mode,
+# so an empty CLOUDFLARE_API_TOKEN is harmless.
+(tls_cloudflare) {
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+}
+
+# ─── Port-based access — http://<server-ip>:<port>, no DNS required ───────────
+
+http://:8096 {
+    import site_common
+    reverse_proxy jellyfin:8096 {
+        # Jellyfin wants the real host for client discovery
+        header_up Host {upstream_hostport}
+    }
+}
+
+http://:8989 {
+    import site_common
+    reverse_proxy sonarr:8989
+}
+
+http://:7878 {
+    import site_common
+    reverse_proxy radarr:7878
+}
+
+http://:6767 {
+    import site_common
+    reverse_proxy bazarr:6767
+}
+
+http://:9696 {
+    import site_common
+    reverse_proxy prowlarr:9696
+}
+
+http://:8080 {
+    import site_common
+    reverse_proxy qbittorrent:8080 {
+        # qBittorrent validates the Host header; an IP-literal Host matching
+        # its own address passes, dotless container names do not.
+        header_up Host {upstream_hostport}
+    }
+}
+
+http://:5055 {
+    import site_common
+    reverse_proxy jellyseerr:5055
+}
+
+# ── Optional profiles (502 until enabled — harmless) ──────────────────────────
+
+http://:9117 {
+    import site_common
+    reverse_proxy jackett:9117
+}
+
+http://:6500 {
+    import site_common
+    reverse_proxy rdtclient:6500
+}
+
+http://:4567 {
+    import site_common
+    reverse_proxy suwayomi:4567
+}
+
+http://:25600 {
+    import site_common
+    reverse_proxy komga:25600
+}
+
+http://:8081 {
+    import site_common
+    # Pi-hole v6 no longer redirects / → /admin; do it here
+    redir / /admin/ 302
+    reverse_proxy pihole:80
+}
+
+# ─── Domain mode (optional) ───────────────────────────────────────────────────
+# `./mc setup` writes caddy/sites/domain.caddy when you configure a domain.
+# A glob that matches nothing is fine — local-only setups need no file here.
+import sites/*.caddy
