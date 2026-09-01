@@ -92,19 +92,21 @@ is and why the order matters. New to the *arr world? Read that instead.
    Settings → Downloads → Default Save Path: `/data/downloads/complete`,
    and tick "Keep incomplete torrents in": `/data/downloads/incomplete`.
    [→ guide](docs/first-time-setup.md#qbittorrent-the-downloader)
-2. **Prowlarr** (`:9696`) — create your login. Add indexers (Indexers → Add;
-   start with a few public ones). Then Settings → Apps → add **Sonarr**
-   (server `http://sonarr:8989`, its API key is in Sonarr → Settings →
-   General) and **Radarr** (`http://radarr:7878`) — Prowlarr now pushes
-   every indexer to both automatically.
-   [→ guide (read this one!)](docs/first-time-setup.md#prowlarr-the-search-brain)
-3. **Sonarr** (`:8989`) — Settings → Media Management → Add Root Folder:
-   `/data/tv`. Settings → Download Clients → add qBittorrent: host
-   `172.28.0.50`, port `8080`, your qBittorrent login.
+2. **Sonarr** (`:8989`) — create your login (first visit asks). Settings →
+   Media Management → Add Root Folder: `/data/tv`. Settings → Download
+   Clients → add qBittorrent: host `172.28.0.50`, port `8080`, your
+   qBittorrent login.
    [→ guide](docs/first-time-setup.md#sonarr-tv-shows)
-4. **Radarr** (`:7878`) — same, with root folder `/data/movies` and the same
+3. **Radarr** (`:7878`) — same, with root folder `/data/movies` and the same
    qBittorrent client.
    [→ guide](docs/first-time-setup.md#radarr-movies)
+4. **Prowlarr** (`:9696`) — create your login. Add indexers (Indexers → Add;
+   start with a few public ones). Then Settings → Apps → add **Sonarr**
+   (server `http://sonarr:8989`, its API key is in Sonarr → Settings →
+   General) and **Radarr** (`http://radarr:7878`) — Prowlarr pushes every
+   indexer to both automatically. Now you can add your first show/movie in
+   Sonarr/Radarr.
+   [→ guide (read this one!)](docs/first-time-setup.md#prowlarr-the-search-brain)
 5. **Bazarr** (`:6767`) — Settings → Sonarr: address `sonarr`, port `8989`,
    API key from Sonarr. Settings → Radarr: address `radarr`, port `7878`.
    Settings → Languages: pick yours. Add a couple of providers

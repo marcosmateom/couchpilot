@@ -74,6 +74,43 @@ apps see, which is what makes imports instant (hardlinks) instead of copies.
 
 ---
 
+## Sonarr: TV shows
+
+Open `http://server-ip:8989`.
+
+1. **Create your login.** The first visit shows an authentication screen:
+   pick **Forms (Login Page)**, choose a username and password → Save.
+2. **Root folder** (where your shows will live): Settings →
+   **Media Management** → **Add Root Folder** → `/data/tv`.
+3. **Download client** (how it hands work to qBittorrent): Settings →
+   **Download Clients** → **+** → qBittorrent:
+   - Host: `172.28.0.50` — this is qBittorrent's internal address, and
+     couchpilot pins it to that exact value for everyone, so just type it
+     as-is. (Why an IP and not a name? qBittorrent rejects container
+     names — expected. Only different if you edited `QBIT_IP` in `.env`,
+     in which case use that value; check with `grep QBIT_IP .env`.)
+   - Port: `8080`
+   - Username/password: your qBittorrent login from earlier
+   - Test → Save.
+
+Don't add a show yet — searching finds nothing until Prowlarr (two steps
+down) gives Sonarr its indexers.
+
+---
+
+## Radarr: movies
+
+Open `http://server-ip:7878`. It's Sonarr's twin, so this will feel familiar:
+
+1. **Create your login** on the first-visit authentication screen (Forms,
+   username, password), like in Sonarr.
+2. Settings → **Media Management** → **Add Root Folder** → `/data/movies`.
+3. Settings → **Download Clients** → **+** → qBittorrent → host
+   `172.28.0.50`, port `8080`, your qBittorrent login (same values and same
+   reasoning as in Sonarr) → Test → Save.
+
+---
+
 ## Prowlarr: the search brain
 
 Open `http://server-ip:9696`. This is the app newcomers find weirdest, so
@@ -91,7 +128,8 @@ thank yourself later.
 
 Setup:
 
-1. First visit asks you to create a login — do it.
+1. **Create your login** on the first-visit authentication screen, like in
+   Sonarr/Radarr.
 2. **Add indexers**: **Indexers → Add Indexer**. Search the list, click one,
    then **Test** and **Save**.
    - Start with well-known public ones (search for them in the list):
@@ -107,21 +145,25 @@ Setup:
      **FlareSolverr**, Host: `http://flaresolverr:8191`, Tags: `cf` → Save.
    - On the failing indexer, add the tag `cf` — it now goes through the
      unblocking proxy.
-4. **Connect it to Sonarr and Radarr**. First fetch the two API keys —
-   each app only shows its own:
+4. **Fetch the two API keys** — each app only shows its own:
    - Open **Sonarr** in another browser tab (`http://server-ip:8989`) →
      **Settings → General** → under *Security* there's an **API Key** field
-     (a long string of letters and numbers) → copy it.
+     (a long string of letters and numbers) → copy it somewhere.
    - Same for **Radarr** (`http://server-ip:7878`): Settings → General →
      copy its API Key.
-
-   Back in Prowlarr: Settings → **Apps** → **+** (the server addresses
-   below are literal — type them exactly as written; see "two kinds of
-   addresses" at the top):
-   - **Sonarr**: Prowlarr Server `http://prowlarr:9696`, Sonarr Server
-     `http://sonarr:8989`, API Key: paste *Sonarr's* key → Test → Save.
-   - **Radarr**: same idea — Radarr Server `http://radarr:7878`, API Key:
-     paste *Radarr's* key → Test → Save.
+5. **Connect Sonarr**: back in Prowlarr, Settings → **Apps** → **+** →
+   **Sonarr**. The form has *two* address fields, which trips everyone up —
+   they describe the two directions of the conversation:
+   - **Prowlarr Server** — the address *Sonarr* will use to call Prowlarr
+     back. It should already say `http://prowlarr:9696`; leave it (fix it
+     if not).
+   - **Sonarr Server** — the address *Prowlarr* uses to reach Sonarr:
+     `http://sonarr:8989`.
+   - **API Key** — paste the key you copied *from Sonarr*.
+   - **Test** (both directions get checked) → **Save**.
+6. **Connect Radarr**: Settings → Apps → **+** → **Radarr** — Prowlarr
+   Server stays `http://prowlarr:9696`, Radarr Server `http://radarr:7878`,
+   API Key from *Radarr* → Test → Save.
 
 That's it. Open Sonarr or Radarr → Settings → Indexers and you'll see every
 indexer already there, tagged "Prowlarr". Never add indexers anywhere else
@@ -129,43 +171,22 @@ again — always in Prowlarr.
 
 ---
 
-## Sonarr: TV shows
+## Now: add your first show and movie
 
-Open `http://server-ip:8989`.
+The machinery is connected — let's see it run.
 
-1. **Root folder** (where your shows live): Settings → **Media Management**
-   → **Add Root Folder** → `/data/tv`.
-2. **Download client** (how it hands work to qBittorrent): Settings →
-   **Download Clients** → **+** → qBittorrent:
-   - Host: `172.28.0.50` — this is qBittorrent's internal address, and
-     couchpilot pins it to that exact value for everyone, so just type it
-     as-is. (Why an IP and not a name? qBittorrent rejects container
-     names — expected. Only different if you edited `QBIT_IP` in `.env`,
-     in which case use that value; check with `grep QBIT_IP .env`.)
-   - Port: `8080`
-   - Username/password: your qBittorrent login from earlier
-   - Test → Save.
-3. Indexers came from Prowlarr already — nothing to do.
-4. **Add your first show**: Series → **Add New** → search → pick the show:
-   - Root Folder: `/data/tv`
-   - Quality Profile: `HD-1080p` is a sane default (profiles decide what
-     quality to grab; you can tune them later under Settings → Profiles)
-   - **Add**. Sonarr searches, sends the download to qBittorrent, waits,
-     imports, renames. Watch it happen under **Activity → Queue**.
+- **A show**: Sonarr → **Series → Add New** → search → pick one:
+  - Root Folder: `/data/tv`
+  - Quality Profile: `HD-1080p` is a sane default (profiles decide what
+    quality to grab; tune them later under Settings → Profiles)
+  - **Add**. Sonarr searches your indexers, sends the download to
+    qBittorrent, waits, imports, renames. Watch it happen live under
+    **Activity → Queue**.
+- **A movie**: Radarr → **Movies → Add New** → search → Root Folder
+  `/data/movies`, Quality Profile `HD-1080p` → Add.
 
-Sonarr keeps monitoring: when the next episode airs, it grabs it by itself.
-
----
-
-## Radarr: movies
-
-Open `http://server-ip:7878`. It's Sonarr's twin, so this will feel familiar:
-
-1. Settings → **Media Management** → **Add Root Folder** → `/data/movies`.
-2. Settings → **Download Clients** → **+** → qBittorrent → host `172.28.0.50`,
-   port `8080`, your login → Test → Save.
-3. **Add a movie**: Movies → **Add New** → search → Root Folder
-   `/data/movies`, Quality Profile `HD-1080p` → Add.
+Sonarr keeps monitoring what you add: when the next episode airs, it grabs
+it by itself.
 
 ---
 
@@ -175,7 +196,7 @@ Open `http://server-ip:6767`. Bazarr watches what Sonarr/Radarr import and
 fetches subtitles for it.
 
 1. Settings → **Sonarr**: Address `sonarr`, Port `8989`, API key *from
-   Sonarr* → Test → Save.
+   Sonarr* (the one you copied in the Prowlarr step) → Test → Save.
 2. Settings → **Radarr**: Address `radarr`, Port `7878`, API key *from
    Radarr* → Test → Save.
 3. Settings → **Languages**: create a Language Profile with the languages
