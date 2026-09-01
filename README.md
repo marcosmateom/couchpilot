@@ -184,6 +184,36 @@ Something else: `./mc logs <app>` almost always names the problem.
 - `./mc` is a thin wrapper around `docker compose` that makes `.env` always
   win over your shell environment (a classic Compose footgun).
 
+## Credits
+
+couchpilot is just the glue — the actual magic is these projects, each
+independently developed and licensed. Go star them:
+
+[Jellyfin](https://jellyfin.org) (GPL-2.0) ·
+[Sonarr](https://sonarr.tv) (GPL-3.0) ·
+[Radarr](https://radarr.video) (GPL-3.0) ·
+[Bazarr](https://www.bazarr.media) (GPL-3.0) ·
+[Prowlarr](https://prowlarr.com) (GPL-3.0) ·
+[Jellyseerr](https://github.com/fallenbagel/jellyseerr) (MIT) ·
+[qBittorrent](https://www.qbittorrent.org) (GPL-2.0+) ·
+[FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) (MIT) ·
+[Caddy](https://caddyserver.com) (Apache-2.0) ·
+[Pi-hole](https://pi-hole.net) (EUPL-1.2) ·
+[Unbound](https://nlnetlabs.nl/projects/unbound/) (BSD-3) ·
+[Tailscale](https://tailscale.com) (BSD-3) ·
+[Suwayomi](https://github.com/Suwayomi/Suwayomi-Server) (MPL-2.0) ·
+[Komga](https://komga.org) (MIT) ·
+[Jackett](https://github.com/Jackett/Jackett) (GPL-2.0) ·
+[RDTClient](https://github.com/rogerfar/rdt-client) (MIT) ·
+[dockurr/samba](https://github.com/dockur/samba) (MIT) ·
+[LinuxServer.io](https://www.linuxserver.io) container images
+
+The single-`/data` hardlink layout follows the excellent
+[TRaSH Guides](https://trash-guides.info) conventions — read them when you
+want to go deeper on quality profiles and naming.
+
 ## License
 
-MIT — do whatever you want with it.
+MIT — for **this repository** (the compose file, scripts, and docs). Each
+application above keeps its own license; couchpilot doesn't redistribute
+any of them, it just runs their official Docker images.
