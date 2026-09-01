@@ -72,10 +72,9 @@ say "Re-running this wizard later is always safe — it remembers your answers."
 title "Checking your system..."
 
 if [[ "$(uname -s)" != "Linux" ]]; then
-  fail "couchpilot supports Linux only.
-On Windows or macOS, run it inside a Linux virtual machine (or WSL2 at your
-own risk — Docker Desktop's host networking, GPU passthrough and port 53
-handling all behave differently, so it is unsupported)."
+  fail "couchpilot runs on Linux only.
+On Windows or macOS, run it inside a Linux virtual machine instead.
+(WSL2 might work but is unsupported — too many things behave differently.)"
 fi
 
 if ! command -v docker &>/dev/null; then
@@ -136,8 +135,10 @@ done
 if ! mountpoint -q "$DATA_DIR" 2>/dev/null; then
   fs_dev="$(df --output=target "$DATA_DIR" 2>/dev/null | tail -1)"
   if [[ "$fs_dev" == "/" ]]; then
-    warn "Note: $DATA_DIR is on your root filesystem. If your media lives on a"
-    warn "separate drive, mount it first (see docs/storage.md) and re-run setup."
+    warn "Note: $DATA_DIR is on your main system disk. That's fine if this"
+    warn "machine only has one disk — just keep an eye on free space. If your"
+    warn "media should live on a separate/bigger drive, set that drive up"
+    warn "first (docs/storage.md explains how) and re-run setup."
   fi
 fi
 
@@ -162,7 +163,8 @@ while true; do
     mkdir_logged "$def/$sub"
   done
   if ! mountpoint -q "$def" 2>/dev/null; then
-    warn "  Heads-up: $def is not a mountpoint — if it should be a drive, check docs/storage.md"
+    warn "  Heads-up: no drive seems to be mounted at $def right now — if it's"
+    warn "  supposed to be one, docs/storage.md shows how to set that up."
   fi
   EXTRA_DRIVES_NEW="${EXTRA_DRIVES_NEW:+$EXTRA_DRIVES_NEW }$def"
   idx=$((idx+1))
@@ -171,12 +173,14 @@ EXTRA_DRIVES="$EXTRA_DRIVES_NEW"
 
 # ── 3. User / permissions ─────────────────────────────────────────────────────
 title "3/8  File ownership"
-ask PUID "User ID that owns your media (from: id -u)" "${PUID:-$(id -u)}"
-ask PGID "Group ID (from: id -g)" "${PGID:-$(id -g)}"
+say "The apps run as your user so files aren't owned by root. The detected"
+say "values below are right for almost everyone — just press Enter twice."
+ask PUID "User ID" "${PUID:-$(id -u)}"
+ask PGID "Group ID" "${PGID:-$(id -g)}"
 owner_uid="$(stat -c %u "$DATA_DIR" 2>/dev/null || echo "$PUID")"
 if [[ "$owner_uid" != "$PUID" ]]; then
-  warn "Note: $DATA_DIR is owned by uid $owner_uid, not $PUID."
-  warn "Fix with:  sudo chown -R $PUID:$PGID $DATA_DIR"
+  warn "Note: your media folder belongs to a different user (id $owner_uid)."
+  warn "Make it yours with:  sudo chown -R $PUID:$PGID $DATA_DIR"
 fi
 
 # ── 4. Hardware transcoding ───────────────────────────────────────────────────
@@ -286,14 +290,19 @@ else
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
+case "$HWACCEL" in
+  vaapi)  hw_human="GPU (Intel/AMD)" ;;
+  nvidia) hw_human="GPU (NVIDIA)" ;;
+  *)      hw_human="CPU only" ;;
+esac
 title "Summary"
 say "  Timezone:        $TZ"
 say "  Media folder:    $DATA_DIR"
 [[ -n "$EXTRA_DRIVES" ]] && say "  Extra drives:    $EXTRA_DRIVES"
-say "  Runs as:         $PUID:$PGID"
-say "  Transcoding:     $HWACCEL"
+say "  Runs as user:    $PUID:$PGID"
+say "  Transcoding:     $hw_human"
 say "  Extras:          ${profiles:-none}"
-say "  Domain:          ${DOMAIN:-none (http://server-ip:port)}"
+say "  Domain:          ${DOMAIN:-none (access via http://server-ip:port)}"
 say ""
 if ! yesno "Write this configuration?" "y"; then
   fail "Nothing written. Re-run ./mc setup whenever you like."
