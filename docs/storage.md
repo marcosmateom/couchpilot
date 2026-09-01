@@ -43,6 +43,18 @@ starting with `sd`/`nvme` per physical disk.
 
 ## Using a dedicated drive
 
+This section applies to **any drive you added yourself** — a second internal
+disk *or* an external USB drive. It works the same for both, and both need
+it: Linux only mounts at boot what the OS installer set up (your system
+disk); anything added later is invisible until you mount it.
+
+> **"But my USB drive just works when I plug it in!"** — on a desktop, the
+> file manager auto-mounts it *when you click it*, at a path that can
+> change, and only while you're logged in. At boot — which is when the
+> couchpilot containers start — it isn't mounted, and the apps would see an
+> empty folder. That's why even external drives get the fstab treatment
+> below on a server.
+
 Mount the drive first, then point the wizard at it. First find the drive's
 name:
 
